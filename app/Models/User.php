@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\helpers\FilterField;
+use App\traits\CanFilter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, CanFilter;
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +25,16 @@ class User extends Authenticatable
         'excerpt',
         'email',
         'password',
+    ];
+
+    /**
+     * @var FilterField[]
+     */
+    protected static $filterFields = [
+        ["column" => "firstname", "comparator" => "LIKE", "field" => "_firstname"],
+        ["column" => "lastname", "comparator" => "LIKE", "field" => "_lastname"],
+        ["column" => "email", "comparator" => "LIKE", "field" => "_email"],
+        ["column" => "id", "comparator" => "=", "field" => "_key"],
     ];
 
     /**
@@ -45,8 +56,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Notes relation;
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function notes()
     {
         return $this->hasMany(Note::class);
     }
+
+
 }
